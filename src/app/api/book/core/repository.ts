@@ -35,8 +35,6 @@ export function getWishList(page?: number) {
     (book) => book.isWishListed
   );
 
-  console.log({ wishList });
-
   const books = wishList.slice((page - 1) * 6, page * 6);
   const pageQtd = Math.ceil(wishList.length / 6);
   return { books, pageQtd };

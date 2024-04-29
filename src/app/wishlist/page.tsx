@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/card";
 import { useEffect, useState } from "react";
 import { Menubar, MenubarMenu } from "@radix-ui/react-menubar";
-import { book } from "./api/book/core/entity";
 import {
   Pagination,
   PaginationContent,
@@ -21,24 +20,25 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { book } from "../api/book/core/entity";
 import Link from "next/link";
 
 export default function Home() {
-  const [books, setBooks] = useState<book[]>([]);
+  const [wishList, setWishList] = useState<book[]>([]);
   const [page, setPage] = useState(1);
   const [pageQtd, setPageQtd] = useState(1);
 
   useEffect(() => {
-    const getBooks = async () => {
-      const response = await fetch("/api/book?page=" + page);
+    const getWishBooks = async () => {
+      const response = await fetch("/api/book/wishlist?page=" + page);
       const { books, pageQtd } = await response.json();
-      setBooks(books);
+      setWishList(books);
       setPageQtd(pageQtd);
     };
-    getBooks();
+    getWishBooks();
   }, [page]);
 
-  const updateWishListStatusHandle = async (id: string) => {
+  const removeFromWishListHandle = async (id: string) => {
     const response = await fetch("/api/book/wishlist", {
       method: "POST",
       headers: {
@@ -47,7 +47,7 @@ export default function Home() {
       body: JSON.stringify({ id }),
     });
     const book = await response.json();
-    setBooks((prev) => prev.map((b) => (b.id === book.id ? book : b)));
+    setWishList((prev) => prev.filter((b) => b.id !== book.id));
   };
 
   return (
@@ -59,7 +59,7 @@ export default function Home() {
       </Menubar>
 
       <div className="z-10 w-full max-w-5xl items-center justify-evenly font-mono text-sm flex flex-wrap">
-        {books.map((book) => (
+        {wishList.map((book) => (
           <Card key={book.id} className="w-1/4 m-2">
             <CardHeader>
               <CardTitle>{book.name}</CardTitle>
@@ -71,7 +71,7 @@ export default function Home() {
             <CardFooter className="flex justify-between">
               <Button
                 className="w-full"
-                onClick={() => updateWishListStatusHandle(book.id)}
+                onClick={() => removeFromWishListHandle(book.id)}
               >
                 {book.isWishListed ? "Remove from WishList" : "Add to WishList"}
               </Button>
@@ -81,9 +81,9 @@ export default function Home() {
       </div>
       <Link
         className="border bg-primary text-primary-foreground py-1 px-7 rounded"
-        href="/wishlist"
+        href="/"
       >
-        Wish List
+        Book Store
       </Link>
       <Pagination>
         <PaginationContent>
