@@ -12,16 +12,27 @@ import {
 import { useEffect, useState } from "react";
 import { Menubar, MenubarMenu } from "@radix-ui/react-menubar";
 import { book } from "./api/book/core/entity";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 export default function Home() {
   const [books, setBooks] = useState<book[]>([]);
   const [page, setPage] = useState(1);
+  const [pageQtd, setPageQtd] = useState(1);
 
   useEffect(() => {
     const getBooks = async () => {
       const response = await fetch("/api/book?page=" + page);
-      const { books } = await response.json();
+      const { books, pageQtd } = await response.json();
       setBooks(books);
+      setPageQtd(pageQtd);
     };
     getBooks();
   }, [page]);
@@ -67,6 +78,36 @@ export default function Home() {
           </Card>
         ))}
       </div>
+      <Pagination>
+        <PaginationContent>
+          <PaginationItem>
+            <PaginationPrevious
+              onClick={() =>
+                setPage((page) => {
+                  return page > 1 ? page - 1 : page;
+                })
+              }
+              href={""}
+            />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationLink href="#">{page}</PaginationLink>
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationEllipsis />
+          </PaginationItem>
+          <PaginationItem>
+            <PaginationNext
+              onClick={() =>
+                setPage((page) => {
+                  return page < pageQtd ? page + 1 : page;
+                })
+              }
+              href=""
+            />
+          </PaginationItem>
+        </PaginationContent>
+      </Pagination>
     </main>
   );
 }
