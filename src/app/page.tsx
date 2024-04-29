@@ -26,6 +26,18 @@ export default function Home() {
     getBooks();
   }, [page]);
 
+  const updateWishListStatusHandle = async (id: string) => {
+    const response = await fetch("/api/book/wishlist", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ id }),
+    });
+    const book = await response.json();
+    setBooks((prev) => prev.map((b) => (b.id === book.id ? book : b)));
+  };
+
   return (
     <main className="flex min-h-screen flex-col items-center px-24 py-14 h-screen">
       <Menubar className="fixed top-0 flex items-center justify-center p-3 border bg-primary text-primary-foreground w-full rounded-md">
@@ -45,7 +57,10 @@ export default function Home() {
             </CardHeader>
             <CardContent></CardContent>
             <CardFooter className="flex justify-between">
-              <Button className="w-full">
+              <Button
+                className="w-full"
+                onClick={() => updateWishListStatusHandle(book.id)}
+              >
                 {book.isWishListed ? "Remove from WishList" : "Add to WishList"}
               </Button>
             </CardFooter>
